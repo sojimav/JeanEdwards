@@ -10,8 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache();  //
 builder.Services.AddSingleton<CacheLatest>();
 
-var omdb = new OMDb();
-builder.Configuration.GetSection("OMDb").Bind(omdb);
+builder.Services.Configure<OMDb>(builder.Configuration.GetSection("OMDb"));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JeanEdwardTask\JeanEdwardTask.API.csproj" />
+    <ProjectReference Include="..\JeanEdwardTask\JeanEdwardTask.csproj" />
   </ItemGroup>
 
   <ItemGroup>

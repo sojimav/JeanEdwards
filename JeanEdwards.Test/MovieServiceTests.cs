@@ -1,5 +1,7 @@
 ﻿using JeanEdwardTask.API.DataTransfer;
 using JeanEdwardTask.API.Integrations;
+using JeanEdwardTask.API.Services;
+using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -11,6 +13,7 @@ namespace JeanEdwardTask.Test
     {
         private readonly ImdbClientIntegration _movieService;
         private readonly Mock<HttpMessageHandler> _mockHttpMessageHandler;
+        private readonly OMDb _oMDb;
 
         public MovieServiceTests()
         {
@@ -19,10 +22,23 @@ namespace JeanEdwardTask.Test
             {
                 BaseAddress = new Uri("http://www.omdbapi.com/")
             };
-            _movieService = new ImdbClientIntegration(httpClient);
+
+            
+            _oMDb = new OMDb
+            {
+                Key = "abf7f2d", 
+                BaseUrl = "http://www.omdbapi.com/"
+            };
+
+            // Create an IOptions<OMDb> instance
+            var options = Options.Create(_oMDb);
+
+            // Initialize ImdbClientIntegration with IOptions<OMDb>
+            _movieService = new ImdbClientIntegration(httpClient, options);
         }
 
-       
+
+
         [Fact]
         public async Task SearchMoviesAsync_ShouldReturnMovies_WhenMoviesAreFound()
         {

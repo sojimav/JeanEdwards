@@ -1,5 +1,6 @@
 ﻿using JeanEdwardTask.API.DataTransfer;
 using JeanEdwardTask.API.Services;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http.Headers;
@@ -10,11 +11,11 @@ namespace JeanEdwardTask.API.Integrations
     public class ImdbClientIntegration
     {
         private readonly HttpClient _client;
+        private readonly OMDb oMDb;
+        
 
-        //public static readonly string apiKey = "abf7f2d";
-        //private static readonly string baseUrl = "";
 
-        public ImdbClientIntegration(HttpClient httpClient)
+        public ImdbClientIntegration(HttpClient httpClient, IOptions<OMDb> omdbOptions)
         {
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
@@ -24,10 +25,12 @@ namespace JeanEdwardTask.API.Integrations
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            
+            this.oMDb = omdbOptions.Value;
+
         }
 
-
+     
+      
 
         public async Task<T> GetAsync<T>(string relativePath)
         {
@@ -61,7 +64,7 @@ namespace JeanEdwardTask.API.Integrations
 
         private Uri CreateRequestUri(string relativePath, string queryString = "")
         {
-            var endpoint = new Uri(string.Concat(OMDb.BaseUrl, relativePath));
+            var endpoint = new Uri(string.Concat(oMDb.BaseUrl, relativePath));
             var uriBuilder = new UriBuilder(endpoint);
             if (!string.IsNullOrEmpty(queryString))
             {
@@ -108,7 +111,7 @@ namespace JeanEdwardTask.API.Integrations
 
         public async Task<MovieSearchResult> SearchMoviesAsync(string? search = "", string? title = "", string? year = "", string? plot = "full")
         {
-            var url = $"/?apikey={OMDb.Key}&s={search}&t={title}&y={year}&plot={plot}";
+            var url = $"/?apikey={oMDb.Key}&s={search}&t={title}&y={year}&plot={plot}";
             var response = await GetAsync<MovieSearchResult>(url);
             return  response ?? new MovieSearchResult();
             
@@ -116,7 +119,7 @@ namespace JeanEdwardTask.API.Integrations
 
         public async Task<MovieResponse> GetMovieDetailsAsync(string imdbId)
         {
-            var url = $"/?apikey={OMDb.Key}&i={imdbId}&plot=full";
+            var url = $"/?apikey={oMDb.Key}&i={imdbId}&plot=full";
             var response = await GetAsync<MovieResponse>(url);
             return response ?? new MovieResponse();
         }
