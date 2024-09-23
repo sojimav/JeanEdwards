@@ -12,6 +12,13 @@ builder.Services.AddSingleton<CacheLatest>();
 
 builder.Services.Configure<OMDb>(builder.Configuration.GetSection("OMDb"));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -24,6 +31,7 @@ var app = builder.Build();
     app.UseSwagger();
     app.UseSwaggerUI();
 
+app.UseCors("AllowAllOrigins");
 
 app.UseHttpsRedirection();
 
